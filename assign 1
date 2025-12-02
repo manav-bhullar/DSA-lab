@@ -1,0 +1,227 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int arr[100], n = 0, choice, pos, val, i;
+
+    while (true) {
+        cout << "\n--- MENU ---\n";
+        cout << "1. CREATE\n2. DISPLAY\n3. INSERT\n4. DELETE\n5. LINEAR SEARCH\n6. EXIT\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            cout << "Enter number of elements: ";
+            cin >> n;
+            cout << "Enter elements: ";
+            for (i = 0; i < n; i++) cin >> arr[i];
+            break;
+
+        case 2:
+            if (n == 0) { cout << "Array empty\n"; break; }
+            cout << "Array: ";
+            for (i = 0; i < n; i++) cout << arr[i] << " ";
+            cout << endl;
+            break;
+
+        case 3:
+            cout << "Enter position (0-based): ";
+            cin >> pos;
+            cout << "Enter value: ";
+            cin >> val;
+            if (pos < 0 || pos > n) { cout << "Invalid position\n"; break; }
+            for (i = n; i > pos; i--) arr[i] = arr[i-1];
+            arr[pos] = val;
+            n++;
+            break;
+
+        case 4:
+            cout << "Enter position to delete (0-based): ";
+            cin >> pos;
+            if (pos < 0 || pos >= n) { cout << "Invalid position\n"; break; }
+            for (i = pos; i < n-1; i++) arr[i] = arr[i+1];
+            n--;
+            break;
+
+        case 5:
+            cout << "Enter value to search: ";
+            cin >> val;
+            for (i = 0; i < n; i++) {
+                if (arr[i] == val) {
+                    cout << "Found at index " << i << endl;
+                    break;
+                }
+            }
+            if (i == n) cout << "Not found\n";
+            break;
+
+        case 6:
+            return 0;
+
+        default:
+            cout << "Invalid choice\n";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+//Q2
+
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int arr[100], n;
+    cout << "Enter n: ";
+    cin >> n;
+
+    cout << "Enter elements: ";
+    for (int i = 0; i < n; i++) cin >> arr[i];
+
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (arr[i] == arr[j]) {
+                // Shift
+                for (int k = j; k < n - 1; k++) arr[k] = arr[k + 1];
+                n--;
+                j--; 
+            }
+        }
+    }
+
+    cout << "Array after removing duplicates: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+}
+
+
+//Q3
+
+int main() {
+    int i;
+    int arr[5] = {1};
+    for (i = 0; i < 5; i++)
+        printf("%d", arr[i]);
+    return 0;
+}
+
+
+
+Q4
+
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int n, arr[100];
+    cin >> n;
+    for (int i = 0; i < n; i++) cin >> arr[i];
+
+    int start = 0, end = n - 1;
+    while (start < end) {
+        swap(arr[start], arr[end]);
+        start++; end--;
+    }
+
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+}
+
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int a[10][10], b[10][10], c[10][10] = {0};
+    int r1, c1, r2, c2;
+
+    cin >> r1 >> c1;
+    for (int i = 0; i < r1; i++)
+        for (int j = 0; j < c1; j++)
+            cin >> a[i][j];
+
+    cin >> r2 >> c2;
+    for (int i = 0; i < r2; i++)
+        for (int j = 0; j < c2; j++)
+            cin >> b[i][j];
+
+    if (c1 != r2) {
+        cout << "Multiplication not possible";
+        return 0;
+    }
+
+    for (int i = 0; i < r1; i++)
+        for (int j = 0; j < c2; j++)
+            for (int k = 0; k < c1; k++)
+                c[i][j] += a[i][k] * b[k][j];
+
+    for (int i = 0; i < r1; i++) {
+        for (int j = 0; j < c2; j++)
+            cout << c[i][j] << " ";
+        cout << endl;
+    }
+}
+
+
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int arr[10][10], r, c;
+    cin >> r >> c;
+
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> arr[i][j];
+
+    for (int j = 0; j < c; j++) {
+        for (int i = 0; i < r; i++)
+            cout << arr[i][j] << " ";
+        cout << endl;
+    }
+}
+
+
+Q5
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int arr[10][10], r, c;
+    cin >> r >> c;
+
+    for (int i = 0; i < r; i++)
+        for (int j = 0; j < c; j++)
+            cin >> arr[i][j];
+
+    cout << "Row sums: ";
+    for (int i = 0; i < r; i++) {
+        int sum = 0;
+        for (int j = 0; j < c; j++)
+            sum += arr[i][j];
+        cout << sum << " ";
+    }
+
+    cout << "\nColumn sums: ";
+    for (int j = 0; j < c; j++) {
+        int sum = 0;
+        for (int i = 0; i < r; i++)
+            sum += arr[i][j];
+        cout << sum << " ";
+    }
+}
+
+
