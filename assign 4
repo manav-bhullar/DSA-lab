@@ -1,0 +1,254 @@
+#include <iostream>
+#include <queue>
+#include <string>
+using namespace std;
+
+/*========================================================
+    1) SIMPLE QUEUE USING ARRAY
+========================================================*/
+class SimpleQueue {
+public:
+    int front, rear, size;
+    int* arr;
+
+    SimpleQueue(int s = 100) {
+        size = s;
+        arr = new int[size];
+        front = rear = -1;
+    }
+
+    bool isEmpty() { return front == -1; }
+    bool isFull()  { return rear == size - 1; }
+
+    void enqueue(int x) {
+        if (isFull()) { cout << "Queue Overflow\n"; return; }
+        if (isEmpty()) front = 0;
+        arr[++rear] = x;
+    }
+
+    int dequeue() {
+        if (isEmpty()) { cout << "Queue Underflow\n"; return -1; }
+        int temp = arr[front];
+        if (front == rear) front = rear = -1;
+        else front++;
+        return temp;
+    }
+
+    int peek() {
+        if (isEmpty()) return -1;
+        return arr[front];
+    }
+
+    void display() {
+        if (isEmpty()) { cout << "Queue Empty\n"; return; }
+        for (int i = front; i <= rear; i++) cout << arr[i] << " ";
+        cout << "\n";
+    }
+};
+
+/*========================================================
+    2) CIRCULAR QUEUE USING ARRAY
+========================================================*/
+class CircularQueue {
+public:
+    int front, rear, size;
+    int* arr;
+
+    CircularQueue(int s = 100) {
+        size = s;
+        arr = new int[size];
+        front = rear = -1;
+    }
+
+    bool isEmpty() { return front == -1; }
+    bool isFull()  { return (rear + 1) % size == front; }
+
+    void enqueue(int x) {
+        if (isFull()) { cout << "Circular Queue Full\n"; return; }
+        if (isEmpty()) front = rear = 0;
+        else rear = (rear + 1) % size;
+        arr[rear] = x;
+    }
+
+    int dequeue() {
+        if (isEmpty()) { cout << "Circular Queue Empty\n"; return -1; }
+        int temp = arr[front];
+        if (front == rear) front = rear = -1;
+        else front = (front + 1) % size;
+        return temp;
+    }
+
+    int peek() {
+        if (isEmpty()) return -1;
+        return arr[front];
+    }
+
+    void display() {
+        if (isEmpty()) { cout << "Empty\n"; return; }
+        int i = front;
+        while (true) {
+            cout << arr[i] << " ";
+            if (i == rear) break;
+            i = (i + 1) % size;
+        }
+        cout << "\n";
+    }
+};
+
+/*========================================================
+    3) INTERLEAVE FIRST AND SECOND HALF OF QUEUE
+========================================================*/
+queue<int> interleave(queue<int>& q) {
+    int n = q.size();
+    if (n % 2 != 0) {
+        cout << "Queue size must be even\n";
+        return q;
+    }
+
+    queue<int> firstHalf;
+    for (int i = 0; i < n / 2; i++) {
+        firstHalf.push(q.front());
+        q.pop();
+    }
+
+    queue<int> result;
+    while (!firstHalf.empty()) {
+        result.push(firstHalf.front());
+        firstHalf.pop();
+        result.push(q.front());
+        q.pop();
+    }
+    return result;
+}
+
+/*========================================================
+    4) FIRST NON-REPEATING CHARACTER IN STRING USING QUEUE
+========================================================*/
+void firstNonRepeating(string s) {
+    queue<char> q;
+    int freq[256] = {0};
+
+    for (char c : s) {
+        freq[(int)c]++;
+        q.push(c);
+
+        while (!q.empty() && freq[(int)q.front()] > 1)
+            q.pop();
+
+        if (q.empty()) cout << "-1 ";
+        else cout << q.front() << " ";
+    }
+    cout << "\n";
+}
+
+/*========================================================
+    5A) STACK USING TWO QUEUES
+========================================================*/
+class StackTwoQueues {
+public:
+    queue<int> q1, q2;
+
+    void push(int x) {
+        q2.push(x);
+        while (!q1.empty()) {
+            q2.push(q1.front());
+            q1.pop();
+        }
+        swap(q1, q2);
+    }
+
+    int pop() {
+        if (q1.empty()) return -1;
+        int x = q1.front(); q1.pop();
+        return x;
+    }
+
+    int top() {
+        if (q1.empty()) return -1;
+        return q1.front();
+    }
+
+    bool empty() { return q1.empty(); }
+};
+
+/*========================================================
+    5B) STACK USING ONE QUEUE
+========================================================*/
+class StackOneQueue {
+public:
+    queue<int> q;
+
+    void push(int x) {
+        int sz = q.size();
+        q.push(x);
+        for (int i = 0; i < sz; i++) {
+            q.push(q.front());
+            q.pop();
+        }
+    }
+
+    int pop() {
+        if (q.empty()) return -1;
+        int x = q.front(); q.pop();
+        return x;
+    }
+
+    int top() {
+        if (q.empty()) return -1;
+        return q.front();
+    }
+
+    bool empty() { return q.empty(); }
+};
+
+/*========================================================
+    MAIN FUNCTION (DEMO)
+========================================================*/
+int main() {
+
+    // ---------------- Simple Queue Demo ----------------
+    SimpleQueue sq(10);
+    sq.enqueue(10);
+    sq.enqueue(20);
+    sq.enqueue(30);
+    cout << "Simple Queue: "; sq.display();
+    cout << "Dequeued: " << sq.dequeue() << "\n";
+
+    // ---------------- Circular Queue Demo ----------------
+    CircularQueue cq(5);
+    cq.enqueue(1); cq.enqueue(2); cq.enqueue(3); cq.enqueue(4);
+    cout << "Circular Queue: "; cq.display();
+    cq.dequeue();
+    cout << "After Dequeue: "; cq.display();
+
+    // ---------------- Interleave Demo ----------------
+    queue<int> test;
+    int arr[] = {4, 7, 11, 20, 5, 9};
+    for (int x : arr) test.push(x);
+
+    queue<int> inter = interleave(test);
+    cout << "Interleaved: ";
+    while (!inter.empty()) {
+        cout << inter.front() << " ";
+        inter.pop();
+    }
+    cout << "\n";
+
+    // ---------------- First Non-Repeating Character Demo ----------------
+    cout << "First non-repeating characters for 'aabc': ";
+    firstNonRepeating("aabc");
+
+    // ---------------- Stack Using Two Queues ----------------
+    StackTwoQueues st2;
+    st2.push(5); st2.push(10); st2.push(15);
+    cout << "StackTwoQueues Top: " << st2.top() << "\n";
+    cout << "Pop: " << st2.pop() << "\n";
+
+    // ---------------- Stack Using One Queue ----------------
+    StackOneQueue st1;
+    st1.push(100); st1.push(200); st1.push(300);
+    cout << "StackOneQueue Top: " << st1.top() << "\n";
+    cout << "Pop: " << st1.pop() << "\n";
+
+    return 0;
+}
