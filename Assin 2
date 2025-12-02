@@ -1,0 +1,233 @@
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+/*========================================================
+  1) BINARY SEARCH
+========================================================*/
+int binarySearch(int arr[], int n, int key) {
+    int l = 0, r = n - 1;
+    while (l <= r) {
+        int mid = (l + r) / 2;
+        if (arr[mid] == key) return mid;
+        else if (arr[mid] < key) l = mid + 1;
+        else r = mid - 1;
+    }
+    return -1;
+}
+
+/*========================================================
+  2) BUBBLE SORT
+========================================================*/
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++)
+            if (arr[j] > arr[j+1])
+                swap(arr[j], arr[j+1]);
+}
+
+/*========================================================
+  3) MISSING NUMBER
+========================================================*/
+// (a) Linear Method
+int missingLinear(int arr[], int n) {
+    int expectedSum = n*(n+1)/2;
+    int actualSum = 0;
+    for (int i = 0; i < n - 1; i++) actualSum += arr[i];
+    return expectedSum - actualSum;
+}
+
+// (b) Binary Search Method for sorted array 1..n
+int missingBinary(int arr[], int n) {
+    int l = 0, r = n - 2;
+    while (l <= r) {
+        int mid = (l + r) / 2;
+        if (arr[mid] == mid + 1) l = mid + 1;
+        else r = mid - 1;
+    }
+    return l + 1;
+}
+
+/*========================================================
+  4) STRING PROGRAMS
+========================================================*/
+// (a) Concatenate
+void concat(char s1[], char s2[]) {
+    strcat(s1, s2);
+}
+
+// (b) Reverse
+void reverseString(char s[]) {
+    int l = 0, r = strlen(s) - 1;
+    while (l < r) swap(s[l++], s[r--]);
+}
+
+// (c) Delete vowels
+void deleteVowels(char s[]) {
+    int k = 0;
+    for (int i = 0; s[i]; i++) {
+        char c = tolower(s[i]);
+        if (!(c=='a'||c=='e'||c=='i'||c=='o'||c=='u'))
+            s[k++] = s[i];
+    }
+    s[k] = '\0';
+}
+
+// (d) Sort strings alphabetically
+void sortStrings(char arr[][100], int n) {
+    for (int i = 0; i < n - 1; i++)
+        for (int j = i + 1; j < n; j++)
+            if (strcmp(arr[i], arr[j]) > 0)
+                swap(arr[i], arr[j]);
+}
+
+// (e) Uppercase → lowercase
+char toLowercase(char c) {
+    if (c >= 'A' && c <= 'Z') return c + 32;
+    return c;
+}
+
+/*========================================================
+  5) SPACE-EFFICIENT MATRIX STORAGE
+========================================================*/
+// (a) Diagonal Matrix (size n)
+class Diagonal {
+public:
+    int n;
+    vector<int> A;  
+    Diagonal(int n) : n(n), A(n, 0) {}
+    void set(int i, int j, int val) { if (i == j) A[i-1] = val; }
+    int get(int i, int j) { return (i == j) ? A[i-1] : 0; }
+};
+
+// (b) Tri-diagonal Matrix (3n - 2)
+class Tridiagonal {
+public:
+    int n;
+    vector<int> A;
+    Tridiagonal(int n) : n(n), A(3*n - 2, 0) {}
+    void set(int i,int j,int x){
+        if(i-j==1) A[i-2]=x;
+        else if(i==j) A[n-1+i-1]=x;
+        else if(j-i==1) A[(2*n-1)+(i-1)] = x;
+    }
+};
+
+// (c) Lower triangular
+class LowerTri {
+public:
+    int n;
+    vector<int> A;
+    LowerTri(int n) : n(n), A(n*(n+1)/2, 0) {}
+    void set(int i,int j,int x){
+        if(i>=j) A[(i*(i-1))/2 + (j-1)] = x;
+    }
+};
+
+// (d) Upper triangular
+class UpperTri {
+public:
+    int n;
+    vector<int> A;
+    UpperTri(int n) : n(n), A(n*(n+1)/2, 0) {}
+    void set(int i,int j,int x){
+        if(i<=j) A[(i-1)*n - (i*(i-1))/2 + (j-i)] = x;
+    }
+};
+
+// (e) Symmetric matrix (store lower triangle)
+class Symmetric {
+public:
+    int n; 
+    vector<int> A;
+    Symmetric(int n) : n(n), A(n*(n+1)/2, 0) {}
+    void set(int i,int j,int x){
+        if(i>=j) A[(i*(i-1))/2 + (j-1)] = x;
+        else A[(j*(j-1))/2 + (i-1)] = x;
+    }
+};
+
+/*========================================================
+  6) SPARSE MATRIX (TRIPLET FORM)
+========================================================*/
+struct Triplet {
+    int r, c, val;
+};
+
+vector<Triplet> transposeSparse(vector<Triplet> &s, int rows, int cols) {
+    vector<Triplet> t;
+    for (int col = 0; col < cols; col++)
+        for (auto &x : s)
+            if (x.c == col)
+                t.push_back({x.c, x.r, x.val});
+    return t;
+}
+
+vector<Triplet> addSparse(vector<Triplet> &a, vector<Triplet> &b) {
+    vector<Triplet> c;
+    int i = 0, j = 0;
+    while (i < a.size() && j < b.size()) {
+        if (a[i].r == b[j].r && a[i].c == b[j].c) {
+            c.push_back({a[i].r, a[i].c, a[i].val + b[j].val});
+            i++; j++;
+        } else if (a[i].r < b[j].r || (a[i].r == b[j].r && a[i].c < b[j].c)) {
+            c.push_back(a[i++]);
+        } else {
+            c.push_back(b[j++]);
+        }
+    }
+    while (i < a.size()) c.push_back(a[i++]);
+    while (j < b.size()) c.push_back(b[j++]);
+    return c;
+}
+
+vector<Triplet> multiplySparse(vector<Triplet> &A, vector<Triplet> &B, int r1, int c1, int c2) {
+    vector<Triplet> C;
+    for (int i = 0; i < r1; i++) {
+        for (int j = 0; j < c2; j++) {
+            int sum = 0;
+            for (auto &a : A)
+                for (auto &b : B)
+                    if (a.r == i && b.c == j && a.c == b.r)
+                        sum += a.val * b.val;
+
+            if (sum != 0) C.push_back({i, j, sum});
+        }
+    }
+    return C;
+}
+
+/*========================================================
+  7) COUNT INVERSIONS
+========================================================*/
+int countInversions(int arr[], int n) {
+    int inv = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = i + 1; j < n; j++)
+            if (arr[i] > arr[j]) inv++;
+    return inv;
+}
+
+/*========================================================
+  8) COUNT DISTINCT ELEMENTS
+========================================================*/
+int countDistinct(int arr[], int n) {
+    int count = 0;
+    for (int i = 0; i < n; i++) {
+        bool seen = false;
+        for (int j = 0; j < i; j++)
+            if (arr[i] == arr[j]) seen = true;
+        if (!seen) count++;
+    }
+    return count;
+}
+
+/*========================================================
+  MAIN (DEMO)
+========================================================*/
+int main() {
+    cout << "Combined Program Executed\n";
+    return 0;
+}
