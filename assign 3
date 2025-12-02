@@ -1,0 +1,225 @@
+#include <iostream>
+#include <cstring>
+#include <cctype>
+using namespace std;
+
+/*========================================================
+    1) STACK USING ARRAY (MENU DRIVEN)
+========================================================*/
+class Stack {
+public:
+    int top, size;
+    int *arr;
+
+    Stack(int s = 100) {
+        size = s;
+        arr = new int[size];
+        top = -1;
+    }
+
+    bool isFull() {
+        return top == size - 1;
+    }
+
+    bool isEmpty() {
+        return top == -1;
+    }
+
+    void push(int x) {
+        if (isFull()) {
+            cout << "Stack Overflow\n";
+            return;
+        }
+        arr[++top] = x;
+    }
+
+    int pop() {
+        if (isEmpty()) {
+            cout << "Stack Underflow\n";
+            return -1;
+        }
+        return arr[top--];
+    }
+
+    int peek() {
+        if (isEmpty()) {
+            cout << "Stack Empty\n";
+            return -1;
+        }
+        return arr[top];
+    }
+
+    void display() {
+        if (isEmpty()) {
+            cout << "Stack Empty\n";
+            return;
+        }
+        for (int i = top; i >= 0; i--)
+            cout << arr[i] << " ";
+        cout << "\n";
+    }
+};
+
+/*========================================================
+    2) REVERSE STRING USING STACK
+========================================================*/
+string reverseWithStack(string s) {
+    Stack st(s.length());
+    for (char c : s) st.push(c);
+    string rev = "";
+    while (!st.isEmpty()) rev += (char)st.pop();
+    return rev;
+}
+
+/*========================================================
+    3) CHECK BALANCED PARENTHESES
+========================================================*/
+bool isBalanced(string exp) {
+    Stack st(exp.length());
+    for (char c : exp) {
+        if (c == '(' || c == '{' || c == '[') {
+            st.push(c);
+        } else if (c == ')' || c == '}' || c == ']') {
+            if (st.isEmpty()) return false;
+            char top = st.pop();
+            if ((c == ')' && top != '(') ||
+                (c == '}' && top != '{') ||
+                (c == ']' && top != '['))
+                return false;
+        }
+    }
+    return st.isEmpty();
+}
+
+/*========================================================
+    4) INFIX TO POSTFIX
+========================================================*/
+int precedence(char c) {
+    if (c == '^') return 3;
+    if (c == '*' || c == '/' || c == '%') return 2;
+    if (c == '+' || c == '-') return 1;
+    return 0;
+}
+
+string infixToPostfix(string inf) {
+    Stack st(inf.length());
+    string post = "";
+
+    for (char c : inf) {
+        if (isalnum(c)) {
+            post += c;
+        }
+        else if (c == '(') {
+            st.push(c);
+        }
+        else if (c == ')') {
+            while (!st.isEmpty() && st.peek() != '(')
+                post += (char)st.pop();
+            st.pop(); // remove '('
+        }
+        else { 
+            while (!st.isEmpty() && precedence(st.peek()) >= precedence(c))
+                post += (char)st.pop();
+            st.push(c);
+        }
+    }
+
+    while (!st.isEmpty()) post += (char)st.pop();
+    return post;
+}
+
+/*========================================================
+    5) EVALUATE POSTFIX EXPRESSION 
+========================================================*/
+int evalPostfix(string post) {
+    Stack st(post.length());
+    for (char c : post) {
+        if (isdigit(c)) {
+            st.push(c - '0');
+        }
+        else {
+            int b = st.pop();
+            int a = st.pop();
+            switch (c) {
+                case '+': st.push(a + b); break;
+                case '-': st.push(a - b); break;
+                case '*': st.push(a * b); break;
+                case '/': st.push(a / b); break;
+            }
+        }
+    }
+    return st.pop();
+}
+
+/*========================================================
+    MAIN (DEMO + MENU FOR STACK PART)
+========================================================*/
+int main() {
+    int choice, x;
+    Stack st(50);
+
+    while (true) {
+        cout << "\n----- STACK MENU -----\n"
+             << "1. PUSH\n"
+             << "2. POP\n"
+             << "3. isEmpty\n"
+             << "4. isFull\n"
+             << "5. DISPLAY\n"
+             << "6. PEEK\n"
+             << "7. EXIT\n"
+             << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter value: ";
+                cin >> x;
+                st.push(x);
+                break;
+
+            case 2:
+                cout << "Popped: " << st.pop() << "\n";
+                break;
+
+            case 3:
+                cout << (st.isEmpty() ? "Empty" : "Not Empty") << "\n";
+                break;
+
+            case 4:
+                cout << (st.isFull() ? "Full" : "Not Full") << "\n";
+                break;
+
+            case 5:
+                st.display();
+                break;
+
+            case 6:
+                cout << "Top: " << st.peek() << "\n";
+                break;
+
+            case 7:
+                goto remaining;
+
+            default:
+                cout << "Invalid choice\n";
+        }
+    }
+
+remaining:
+
+    // Demonstration of other functions
+    cout << "\nReverse of 'DataStructure' = " 
+         << reverseWithStack("DataStructure") << "\n";
+
+    string exp = "{(a+b)*(c-d)}";
+    cout << "Balanced? " << (isBalanced(exp) ? "Yes" : "No") << "\n";
+
+    string inf = "a+b*(c-d)";
+    string post = infixToPostfix(inf);
+    cout << "Infix: " << inf << "\nPostfix: " << post << "\n";
+
+    cout << "Evaluation of postfix '23*54*+': "
+         << evalPostfix("23*54*+") << "\n";
+
+    return 0;
+}
